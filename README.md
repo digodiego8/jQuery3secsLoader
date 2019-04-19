@@ -1,9 +1,6 @@
 # jQuery3secsLoader
-jQuery 3 seconds loader with YouTube-like progress bar
+Options selector with YouTube-like progress bar
 
-=======================================================
- Task: Options selector with YouTube-like progress bar
-=======================================================
 
 ## Preliminary:
 
