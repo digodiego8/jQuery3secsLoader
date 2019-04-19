@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', serif;
+            font-size: 20px;
+            background-color: beige;
+            min-width: 400px;
+            min-height: 300px;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        header {
+            min-height: 50px;
+            width: 100%;
+            display: block;
+            flex: content;
+        }
+
+        header * {
+            width: 24%;
+            min-height: 50px;
+            position: relative;
+            float: left;
+            cursor: pointer;
+        }
+
+        header *:hover {
+            background-color: gainsboro;
+        }
+
+        header span.active,
+        header div.active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        #content {
+            min-height: 250px;
+            width: 100%;
+            height: 100%;
+        }
+
+        #content p {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .YTLikeBar {
+            background-color: red;
+            height: 3px;
+            width: 0%;
+        }
+    </style>
+    <script>
+        var barIsRunning = true;
+        var arrTimeOut = [];
+        $(document).ready(function () {
+            $("span").click(function () {
+                $(this).toggleClass("active");
+                $("div").removeClass("active");
+            });
+            $("div").click(function () {
+                $(this).toggleClass("active");
+                $("span").removeClass("active");
+            });
+            $("header *").click(function () {
+                createNewBar();
+            });
+        });
+
+        function optionSelected() {
+            var optionText = $(".active").text();
+            $("#content p").text(optionText);
+        }
+
+        function createNewBar() {
+            try {
+                if (barIsRunning) arrTimeOut.forEach(stopTimeOut);
+                $(".YTLikeBar").remove();
+                $("<div class='YTLikeBar'></div>").insertAfter("header");
+            } catch (error) {
+                console.log(error);
+            }
+            finally {
+                playYTlikeBar();
+            }
+        }
+
+        function stopTimeOut(item, index) {
+            clearTimeout(item);
+        }
+
+        function playYTlikeBar() {
+            var progress = 0;
+            $('.YTLikeBar').css("width", "0%");
+            var pageWidth = document.body.clientWidth;
+            var unity = pageWidth / 100;
+            var timeInterval = Math.pow(pageWidth, -0.85) * 1000;
+            for (var percent = 1; percent <= 100; percent++) {
+                arrTimeOut.push(setProgress(progress, percent, timeInterval));
+                progress = progress + unity;
+            }
+        }
+
+        function setProgress(progress, percent, timeInterval) {
+            return setTimeout(function () {
+                barIsRunning = percent < 100;
+                !barIsRunning ? optionSelected() : null;
+                console.log("barIsRunning: " + barIsRunning + " - percent: " + percent);
+                $('.YTLikeBar').css("width", percent + "%");
+            }, progress * timeInterval)
+        }
+    </script>
+</head>
+
+
+<body>
+    <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <header>
+        <div class="active">All</div>
+        <span>Option 1</span>
+        <span>Option 2</span>
+        <span>Option 3</span>
+    </header>
+    <div id="content">
+        <p>All</p>
+    </div>
+    <script src="" async defer></script>
+</body>
+
+</html>
