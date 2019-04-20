@@ -31,10 +31,12 @@
             width: 100%;
             display: block;
             flex: content;
+            border-bottom: 1px solid #B1B1B1;
+            margin: 0;
         }
 
         header * {
-            width: 24%;
+            width: 25%;
             min-height: 50px;
             position: relative;
             float: left;
@@ -51,16 +53,18 @@
             text-decoration: underline;
         }
 
-        #content {
-            min-height: 250px;
-            width: 100%;
-            height: 100%;
+        div.content {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center
         }
 
-        #content p {
-            text-align: center;
-            vertical-align: middle;
+        div.content p {
+            margin: 0;
+            text-align: center
         }
+
 
         .YTLikeBar {
             background-color: red;
@@ -72,6 +76,7 @@
         var barIsRunning = true;
         var arrTimeOut = [];
         $(document).ready(function () {
+            setOptionsLayout();
             $("span").click(function () {
                 $(this).toggleClass("active");
                 $("div").removeClass("active");
@@ -81,25 +86,46 @@
                 $("span").removeClass("active");
             });
             $("header *").click(function () {
-                createNewBar();
+                initProgressBar();
             });
         });
 
-        function optionSelected() {
-            var optionText = $(".active").text();
-            $("#content p").text(optionText);
+        function setOptionsLayout() {
+            var hash = window.location.hash;
+            var arrOptions = hash.slice(1).split("|");
+            if (arrOptions.length > 0 && arrOptions[0] != "") {
+                for (var i = arrOptions.length - 1; i >= 0; i--) {
+                    $("<span>" + arrOptions[i] + "</span>").insertAfter("header div.active");
+                }
+                resetCSSWidth(arrOptions.length);
+            }
+            else {
+                $("<span>Opt1</span><span>Opt2</span><span>Opt3</span>").
+                    insertAfter("header div.active");
+            }
+            $("<div class='YTLikeBar'></div>").insertAfter("header");
         }
 
-        function createNewBar() {
+        function resetCSSWidth(numOptions) {
+            $("header *").css("width", (100 / (numOptions + 1)) + "%");
+        }
+
+        function setContent() {
+            var txtOption = $(".active").text();
+            $(".content p").text(txtOption);
+        }
+
+        function initProgressBar() {
             try {
                 if (barIsRunning) arrTimeOut.forEach(stopTimeOut);
+                else arrTimeOut = [];
                 $(".YTLikeBar").remove();
                 $("<div class='YTLikeBar'></div>").insertAfter("header");
             } catch (error) {
                 console.log(error);
             }
             finally {
-                playYTlikeBar();
+                runProgressBar();
             }
         }
 
@@ -107,25 +133,33 @@
             clearTimeout(item);
         }
 
-        function playYTlikeBar() {
+        function runProgressBar() {
+
             var progress = 0;
-            $('.YTLikeBar').css("width", "0%");
-            var pageWidth = document.body.clientWidth;
-            var unity = pageWidth / 100;
-            var timeInterval = Math.pow(pageWidth, -0.85) * 1000;
+            var distanceLeftToRight = document.body.clientWidth;
+            var unit = distanceLeftToRight / 100;
+            var timeOutDistanceFactor = Math.pow(distanceLeftToRight, -0.85) * 1000;
+
+            setCSSProgress(progress);
             for (var percent = 1; percent <= 100; percent++) {
-                arrTimeOut.push(setProgress(progress, percent, timeInterval));
-                progress = progress + unity;
+                arrTimeOut.push(stateProgress(progress, percent, timeOutDistanceFactor));
+                progress = progress + unit;
             }
         }
 
-        function setProgress(progress, percent, timeInterval) {
-            return setTimeout(function () {
-                barIsRunning = percent < 100;
-                !barIsRunning ? optionSelected() : null;
-                console.log("barIsRunning: " + barIsRunning + " - percent: " + percent);
-                $('.YTLikeBar').css("width", percent + "%");
-            }, progress * timeInterval)
+        function stateProgress(progress, percent, timeOutDistanceFactor) {
+            return setTimeout(
+                function () {
+                    barIsRunning = percent < 100;
+                    if (!barIsRunning) setContent();
+                    setCSSProgress(percent);
+                },
+                progress * timeOutDistanceFactor
+            );
+        }
+
+        function setCSSProgress(percent) {
+            $('.YTLikeBar').css("width", percent + "%");
         }
     </script>
 </head>
@@ -137,14 +171,11 @@
         <![endif]-->
     <header>
         <div class="active">All</div>
-        <span>Option 1</span>
-        <span>Option 2</span>
-        <span>Option 3</span>
     </header>
-    <div id="content">
-        <p>All</p>
-    </div>
-    <script src="" async defer></script>
+    <div class="content">
+        <div>
+            Currently selected: <p>All</p>
+        </div>
 </body>
 
 </html>
